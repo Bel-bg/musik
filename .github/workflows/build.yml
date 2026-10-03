@@ -17,12 +17,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'windows-latest'
-            os: 'windows'
-            name: 'Windows'
-          - platform: 'ubuntu-22.04'
-            os: 'linux'
-            name: 'Linux'
+          - platform: "windows-latest"
+            os: "windows"
+            name: "Windows"
+          - platform: "ubuntu-22.04"
+            os: "linux"
+            name: "Linux"
 
     steps:
       - name: Checkout code
@@ -32,7 +32,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -40,7 +40,7 @@ jobs:
       - name: Rust Cache
         uses: swatinem/rust-cache@v2
         with:
-          workspaces: './src-tauri -> target'
+          workspaces: "./src-tauri -> target"
 
       - name: Install Linux dependencies
         if: matrix.os == 'linux'
