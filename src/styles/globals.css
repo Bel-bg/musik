@@ -1,0 +1,215 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-main: #0b0c10;
+  --surface-main: #13151b;
+  --surface-secondary: #181b24;
+  --surface-plate: #1e222d;
+  --surface-cavity: #08090c;
+  --surface-hover: #242836;
+  --border-main: #202430;
+  --border-subtle: #171a22;
+  --border-highlight: rgba(255, 255, 255, 0.08);
+  --accent-main: #f59e0b;
+  --accent-hover: #fbbf24;
+  --accent-glow: rgba(245, 158, 11, 0.45);
+  --text-main: #f1f2f6;
+  --text-muted: #7a8194;
+  --text-subtle: #484e60;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: 'Syne', sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  background-image: 
+    radial-gradient(ellipse at 50% 0%, rgba(30, 34, 45, 0.4) 0%, transparent 75%),
+    linear-gradient(180deg, #0e1015 0%, #090a0d 100%);
+}
+
+/* 4K Metal Grain texture overlay */
+.metal-grain {
+  position: relative;
+}
+.metal-grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  filter: url(#skeuo-noise);
+  opacity: 0.8;
+  z-index: 1;
+}
+
+/* Typography Helpers */
+.font-mono-numbers {
+  font-family: 'DM Mono', monospace;
+  font-feature-settings: 'tnum' on, 'lnum' on;
+}
+
+.heading-tight {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.meta-label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+/* VFD Display & Text glow */
+.vfd-glow {
+  color: #f59e0b;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.6), 0 0 16px rgba(245, 158, 11, 0.3);
+}
+
+.vfd-glow-cyan {
+  color: #06b6d4;
+  text-shadow: 0 0 8px rgba(6, 182, 212, 0.6), 0 0 16px rgba(6, 182, 212, 0.3);
+}
+
+.vfd-glow-dim {
+  color: rgba(245, 158, 11, 0.25);
+}
+
+/* Skeuomorphic Components */
+.skeuo-panel {
+  background: linear-gradient(180deg, #161922 0%, #111319 100%);
+  border: 1px solid #202430;
+  box-shadow: 
+    0 10px 30px -5px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6);
+}
+
+.skeuo-recessed {
+  background: #090a0e;
+  border: 1px solid #181b24;
+  box-shadow: 
+    inset 0 3px 8px rgba(0, 0, 0, 0.9),
+    inset 0 1px 2px rgba(0, 0, 0, 0.7),
+    0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.skeuo-screen {
+  background: radial-gradient(ellipse at 50% 20%, #0d121c 0%, #05070a 100%);
+  border: 1px solid #1a202c;
+  box-shadow: 
+    inset 0 4px 12px rgba(0, 0, 0, 0.95),
+    inset 0 1px 2px rgba(0, 0, 0, 0.8),
+    0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.skeuo-btn {
+  background: linear-gradient(180deg, #222634 0%, #191c26 100%);
+  border: 1px solid #282d3d;
+  box-shadow: 
+    0 3px 5px -1px rgba(0, 0, 0, 0.8),
+    0 1px 2px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+  transition: transform 0.06s ease, box-shadow 0.06s ease;
+}
+
+.skeuo-btn:hover {
+  background: linear-gradient(180deg, #272c3d 0%, #1e222f 100%);
+}
+
+.skeuo-btn:active {
+  transform: translateY(1px);
+  box-shadow: 
+    inset 0 2px 5px rgba(0, 0, 0, 0.9),
+    inset 0 1px 2px rgba(0, 0, 0, 0.7),
+    0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.skeuo-btn-active {
+  background: linear-gradient(180deg, #1a1e28 0%, #141720 100%);
+  border: 1px solid #232838;
+  transform: translateY(1px);
+  box-shadow: 
+    inset 0 3px 6px rgba(0, 0, 0, 0.95),
+    0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Custom Minimal Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090a0e;
+  border-left: 1px solid #161822;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #252a38 0%, #1c202b 100%);
+  border-radius: 4px;
+  border: 1px solid #31374a;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #2e3446 0%, #232837 100%);
+}
+
+/* Hardware Range slider styling */
+input[type='range'] {
+  -webkit-appearance: none;
+  background: transparent;
+}
+
+input[type='range']:focus {
+  outline: none;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #d4d7e1 40%, #8c92a4 100%);
+  border: 1px solid #2b2f3d;
+  cursor: pointer;
+  margin-top: -5px;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+input[type='range']::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 
+    0 0 10px rgba(245, 158, 11, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+input[type='range']::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 4px;
+  cursor: pointer;
+  background: #08090c;
+  border: 1px solid #1c202a;
+  border-radius: 9999px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.9);
+}
