@@ -2,9 +2,11 @@ name: Build Desktop (Windows & Linux)
 
 on:
   push:
+    branches:
+      - main # Permet de tester la compilation à chaque push sur main
     tags:
-      - "v*" # On déclenche la release automatique uniquement sur les tags
-  workflow_dispatch: # Permet de le lancer à la main si besoin
+      - "v*" # Déclenche la création automatique de la Release officielle
+  workflow_dispatch: # Permet de lancer le build manuellement depuis GitHub
 
 permissions:
   contents: write
@@ -52,12 +54,13 @@ jobs:
         run: npm ci
 
       - name: Build and Release Tauri Application
-        uses: tauri-apps/tauri-action@v2
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ github.ref_name }}
+          # Si c'est un tag (v1.0.0), on crée une release. Sinon, on compile juste pour tester.
+          tagName: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
           releaseName: "MUSIK v__VERSION__"
           releaseBody: "Nouvelle version de MUSIK pour Windows et Linux."
-          releaseDraft: false # Passe à false pour publier automatiquement sans rester en brouillon
+          releaseDraft: false
           prerelease: false
