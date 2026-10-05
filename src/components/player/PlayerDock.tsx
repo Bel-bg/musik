@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   ListBullets,
   Pause,
-  PictureInPicture,
   Play,
   SkipBack,
   SkipForward,
@@ -599,7 +598,7 @@ export const TrackControlWidget: React.FC<{
             aria-label="Panneau de contrôle de lecture"
             className="skeu-panel relative w-80 rounded-2xl p-4 flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200"
           >
-            {/* En-tête : puits de la pochette + afficheur titre / artiste */}
+            {/* En-tête : puits de la pochette + afficheur titre / artiste miniature */}
             <div className="flex items-center gap-3">
               <div className="skeu-well w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center">
                 <Waveform
@@ -695,8 +694,7 @@ export const TrackControlWidget: React.FC<{
               title="Continuer la lecture dans une petite fenêtre"
               className="skeu-key skeu-key--rect skeu-key--amber h-11 w-full gap-2 font-mono text-[11px] font-black uppercase tracking-[0.18em] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <PictureInPicture size={18} weight="fill" />
-              Continuer en miniature
+              Lire en Miniature
             </button>
 
             {/* Vis de fixation du panneau */}

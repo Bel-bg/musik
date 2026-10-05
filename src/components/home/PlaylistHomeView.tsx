@@ -3,7 +3,7 @@ import { Plus, ListMusic, FolderOpen, ArrowLeft, Settings } from "lucide-react";
 import { usePlaylistStore } from "@/store/usePlaylistStore";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useLibraryStore } from "@/store/useLibraryStore";
-import { selectImageFile, tauriApi } from "@/lib/tauri";
+import { selectImageFile, tauriApi, openExternalUrl } from "@/lib/tauri";
 import { hapticAudio } from "@/lib/hapticAudio";
 import type { Playlist } from "@/types";
 import { VinylPlaylistCard } from "./VinylPlaylistCard";
@@ -721,7 +721,11 @@ export const PlaylistHomeView: React.FC<PlaylistHomeViewProps> = ({
               href="https://github.com/Bel-bg/Musik"
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => hapticAudio.playToggleSnap()}
+              onClick={(e) => {
+                e.preventDefault();
+                hapticAudio.playToggleSnap();
+                openExternalUrl("https://github.com/Bel-bg/Musik");
+              }}
               title="Projet open source - Découvrir le code source ou contribuer sur GitHub"
               aria-label="Code source GitHub"
               className="skeu-key skeu-key--rect h-10 px-4 gap-2.5 text-xs font-mono font-bold tracking-wider group"

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLibraryStore } from '@/store/useLibraryStore';
 import { usePlayerStore } from '@/store/usePlayerStore';
@@ -7,6 +7,7 @@ import { CustomTitlebar } from '@/components/layout/CustomTitlebar';
 import { AudioEngine } from '@/components/player/AudioEngine';
 import { PlaylistHomeView } from '@/components/home/PlaylistHomeView';
 import { PlaylistCarouselView } from '@/components/playlist/PlaylistCarouselView';
+import { SplashScreen } from '@/components/splash/SplashScreen';
 import { startMiniPlayerBridge } from '@/lib/miniPlayer';
 
 export const App: React.FC = () => {
@@ -16,12 +17,22 @@ export const App: React.FC = () => {
 
   const [activeView, setActiveView] = useState<'home' | 'carousel'>('home');
   const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
+  const [showSplash, setShowSplash] = useState<boolean>(true);
+  const [isDataLoaded, setIsDataLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    loadLibrary();
-    loadPlaylists();
-    loadSavedState();
+    Promise.allSettled([
+      loadLibrary(),
+      loadPlaylists(),
+      loadSavedState(),
+    ]).then(() => {
+      setIsDataLoaded(true);
+    });
   }, [loadLibrary, loadPlaylists, loadSavedState]);
+
+  const handleSplashComplete = useCallback(() => {
+    setShowSplash(false);
+  }, []);
 
   // Relais audio/état vers la fenêtre miniature
   useEffect(() => startMiniPlayerBridge(), []);
@@ -75,6 +86,14 @@ export const App: React.FC = () => {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Audiophile Skeuomorphic Splash Screen */}
+      {showSplash && (
+        <SplashScreen
+          onComplete={handleSplashComplete}
+          isDataLoaded={isDataLoaded}
+        />
+      )}
     </div>
   );
 };

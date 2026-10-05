@@ -4,7 +4,7 @@ import {
   Check,
 } from "lucide-react";
 import { useLibraryStore } from "@/store/useLibraryStore";
-import { tauriApi } from "@/lib/tauri";
+import { tauriApi, openExternalUrl } from "@/lib/tauri";
 import { hapticAudio } from "@/lib/hapticAudio";
 import type { AppSettings } from "@/types";
 
@@ -258,15 +258,14 @@ export const SettingsView: React.FC = () => {
       <div className="skeuo-panel rounded-card p-6 flex flex-col gap-3 metal-grain">
         <div className="flex items-center gap-2 z-10">
           <h2 className="heading-tight text-lg text-text-primary">
-            Confidentialité & Zéro Télémétrie
+            Confidentialité 
           </h2>
         </div>
 
         <div className="text-xs text-text-muted leading-relaxed space-y-2 skeuo-recessed p-4 rounded-lg border border-border z-10">
           <p>
-            Cette application fonctionne à 100% en local sur votre machine.
-            Aucune télémétrie, aucune donnée d'écoute et aucun fichier audio
-            n'est transmis à un serveur distant.
+            Bon, bon moi même j'ai pas l'argent pour héberger serveur qui va voler vos donner d'abord...😒😒😒
+            Bref tout est en local sur vôtre PC. Dès qu'il y a mise à jour de vous informe y'ai pas le temps d'écrire de longue close de Confidentialité aussi j'ai pas forcé quelqu'un a installer mon chef d'oeuvre esthétique ! 😏
           </p>
         </div>
       </div>
@@ -283,7 +282,7 @@ export const SettingsView: React.FC = () => {
             className="h-28 sm:h-36 md:h-44 w-auto max-w-full object-contain rounded-sm" 
           />
           <span className="font-mono-numbers text-accent text-sm font-bold leading-none">
-            v1.0.0
+            v{settings.version || "1.0.0"}
           </span>
         </div>
 
@@ -295,7 +294,12 @@ export const SettingsView: React.FC = () => {
               href="https://github.com/Bel-bg" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="font-medium text-foreground transition-colors hover:text-primary underline underline-offset-4"
+              onClick={(e) => {
+                e.preventDefault();
+                hapticAudio.playToggleSnap();
+                openExternalUrl("https://github.com/Bel-bg");
+              }}
+              className="font-medium text-foreground transition-colors hover:text-primary underline underline-offset-4 cursor-pointer"
             >
               bel.dev
             </a>
