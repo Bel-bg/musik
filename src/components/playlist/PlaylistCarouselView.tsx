@@ -12,6 +12,7 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import { useLibraryStore } from "@/store/useLibraryStore";
 import { tauriApi } from "@/lib/tauri";
 import { hapticAudio } from "@/lib/hapticAudio";
+import { openMiniPlayer } from "@/lib/miniPlayer";
 import { VirtualizedTrackList } from "@/components/library/VirtualizedTrackList";
 import { useTrackCover } from "@/hooks/useTrackCover";
 import { CoverDisplay } from "@/components/player/CoverDisplay";
@@ -594,6 +595,14 @@ export const PlaylistCarouselView: React.FC<PlaylistCarouselViewProps> = ({
             hapticAudio.playToggleSnap();
             setShowQueueList((v) => !v);
           }}
+          onMiniature={
+            currentPl
+              ? () => {
+                  hapticAudio.playHeavySwitch();
+                  void openMiniPlayer(currentPl);
+                }
+              : undefined
+          }
         />
       </div>
     </div>
