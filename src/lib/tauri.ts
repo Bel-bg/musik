@@ -341,7 +341,7 @@ export const tauriApi = {
       restore_last_track_on_startup: true,
       restore_last_view_on_startup: true,
       media_keys_enabled: true,
-      version: '1.0.0',
+      version: '1.0.1',
     };
   },
 
@@ -381,4 +381,23 @@ export const tauriApi = {
     }
     return null;
   },
+
+  async openExternalUrl(url: string): Promise<void> {
+    return openExternalUrl(url);
+  },
 };
+
+export async function openExternalUrl(url: string): Promise<void> {
+  if (isTauriEnvironment()) {
+    try {
+      await invoke('open_external_url', { url });
+      return;
+    } catch (err) {
+      console.warn('[openExternalUrl] invoke failed, fallback window.open:', err);
+    }
+  }
+  if (typeof window !== 'undefined') {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+}
+

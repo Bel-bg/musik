@@ -671,7 +671,7 @@ pub async fn get_settings(state: State<'_, AppState>) -> Result<AppSettings, Str
         media_keys_enabled,
         database_path: Some(state.db.db_path.to_string_lossy().to_string()),
         cache_path: Some(state.cache_dir.to_string_lossy().to_string()),
-        version: Some("1.0.0".to_string()),
+        version: Some(env!("CARGO_PKG_VERSION").to_string()),
     })
 }
 
@@ -828,3 +828,30 @@ fn chrono_now() -> String {
     let since_the_epoch = start.duration_since(UNIX_EPOCH).unwrap_or_default();
     format!("{}", since_the_epoch.as_secs())
 }
+
+#[tauri::command]
+pub async fn open_external_url(url: String) -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    {
+        std::process::Command::new("rundll32")
+            .args(["url.dll,FileProtocolHandler", &url])
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+    #[cfg(target_os = "macos")]
+    {
+        std::process::Command::new("open")
+            .arg(&url)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+    {
+        std::process::Command::new("xdg-open")
+            .arg(&url)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+

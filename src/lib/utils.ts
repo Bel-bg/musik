@@ -50,7 +50,7 @@ export function generateFallbackCoverSvg(title: string, artist: string): string 
     <rect width="300" height="300" fill="#111114"/>
     <circle cx="150" cy="150" r="110" fill="${color}" opacity="0.18"/>
     <circle cx="150" cy="150" r="70" fill="${color}" opacity="0.3"/>
-    <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Syne, sans-serif" font-size="64" font-weight="800" fill="#f0f0f4" letter-spacing="-2">${initials}</text>
+    <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="'Bricolage Grotesque', sans-serif" font-size="64" font-weight="800" fill="#f0f0f4" letter-spacing="-2">${initials}</text>
   </svg>`;
 
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;

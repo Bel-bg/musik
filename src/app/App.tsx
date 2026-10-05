@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
 import { useLibraryStore } from '@/store/useLibraryStore';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { usePlaylistStore } from '@/store/usePlaylistStore';
@@ -8,8 +7,8 @@ import { CustomTitlebar } from '@/components/layout/CustomTitlebar';
 import { AudioEngine } from '@/components/player/AudioEngine';
 import { PlaylistHomeView } from '@/components/home/PlaylistHomeView';
 import { PlaylistCarouselView } from '@/components/playlist/PlaylistCarouselView';
-import { SettingsView } from '@/components/settings/SettingsView';
-import { hapticAudio } from '@/lib/hapticAudio';
+import { SplashScreen } from '@/components/splash/SplashScreen';
+import { startMiniPlayerBridge } from '@/lib/miniPlayer';
 
 export const App: React.FC = () => {
   const { loadLibrary } = useLibraryStore();
@@ -18,13 +17,25 @@ export const App: React.FC = () => {
 
   const [activeView, setActiveView] = useState<'home' | 'carousel'>('home');
   const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [showSplash, setShowSplash] = useState<boolean>(true);
+  const [isDataLoaded, setIsDataLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    loadLibrary();
-    loadPlaylists();
-    loadSavedState();
+    Promise.allSettled([
+      loadLibrary(),
+      loadPlaylists(),
+      loadSavedState(),
+    ]).then(() => {
+      setIsDataLoaded(true);
+    });
   }, [loadLibrary, loadPlaylists, loadSavedState]);
+
+  const handleSplashComplete = useCallback(() => {
+    setShowSplash(false);
+  }, []);
+
+  // Relais audio/état vers la fenêtre miniature
+  useEffect(() => startMiniPlayerBridge(), []);
 
   const handleOpenPlaylist = (playlistId: string) => {
     setSelectedPlaylistId(playlistId);
@@ -74,43 +85,15 @@ export const App: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Discreet Settings Overlay Modal */}
-        <AnimatePresence>
-          {isSettingsOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 15 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 15 }}
-                transition={{ duration: 0.2 }}
-                className="skeuo-panel rounded-card border-2 border-border/80 metal-grain shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden"
-              >
-                {/* Modal Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-border/80 bg-surface/50">
-                  <span className="font-mono text-xs font-bold text-accent uppercase tracking-widest">
-                    CONFIGURATION SYSTÈME
-                  </span>
-                  <button
-                    onClick={() => {
-                      hapticAudio.playToggleSnap();
-                      setIsSettingsOpen(false);
-                    }}
-                    className="p-1 rounded-btn text-text-muted hover:text-text-primary skeuo-btn"
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
-
-                {/* Settings Content Scrollable Area */}
-                <div className="flex-1 overflow-y-auto p-6">
-                  <SettingsView />
-                </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
       </div>
+
+      {/* Audiophile Skeuomorphic Splash Screen */}
+      {showSplash && (
+        <SplashScreen
+          onComplete={handleSplashComplete}
+          isDataLoaded={isDataLoaded}
+        />
+      )}
     </div>
   );
 };

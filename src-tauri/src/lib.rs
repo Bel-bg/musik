@@ -122,6 +122,7 @@ pub fn run() {
             extract_mp3_cover,
             get_stream_info,
             get_audio_cache_stats,
+            open_external_url,
         ])
         .run(tauri::generate_context!())
         .expect("Erreur lors de l'execution de l'application MUSIK");

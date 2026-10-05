@@ -1,3 +1,12 @@
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('/Bricolage_Grotesque/BricolageGrotesque-VariableFont_opsz,wdth,wght.ttf') format('truetype');
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -29,7 +38,7 @@ body {
   padding: 0;
   background-color: var(--bg-main);
   color: var(--text-main);
-  font-family: 'Syne', sans-serif;
+  font-family: 'Bricolage Grotesque', sans-serif;
   user-select: none;
   -webkit-user-select: none;
   overflow: hidden;
@@ -61,13 +70,13 @@ body {
 }
 
 .heading-tight {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Bricolage Grotesque', sans-serif;
   font-weight: 700;
   letter-spacing: -0.03em;
 }
 
 .meta-label {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Bricolage Grotesque', sans-serif;
   font-weight: 700;
   font-size: 0.65rem;
   text-transform: uppercase;

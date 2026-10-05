@@ -41,7 +41,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Syne', 'sans-serif'],
+        sans: ['"Bricolage Grotesque"', 'sans-serif'],
         mono: ['"DM Mono"', 'monospace'],
       },
       borderRadius: {
