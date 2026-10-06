@@ -26,6 +26,17 @@ MUSIK propose une experience d'ecoute moderne, fluide et entierement locale, san
 - Support des touches multimedia systeme et des raccourcis clavier.
 
 ---
+## 3. Quelqques Captures
+![Texte alternatif](public/screenshots/1.png)
+![Texte alternatif](public/screenshots/2.png)
+![Texte alternatif](public/screenshots/3.png)
+![Texte alternatif](public/screenshots/4.png)
+![Texte alternatif](public/screenshots/5.png)
+![Texte alternatif](public/screenshots/6.png)
+![Texte alternatif](public/screenshots/7.png)
+![Texte alternatif](public/screenshots/8.png)
+![Texte alternatif](public/screenshots/9.png)
+![Texte alternatif](public/screenshots/10.png)
 
 ## 3. Architecture technique
 
