@@ -3,6 +3,7 @@ import { convertFileSrc, isTauri } from '@tauri-apps/api/core';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { getAudioFileUrl, getCoverImageUrl, fetchStreamInfo } from '@/lib/tauri';
 import { audioAnalysis } from '@/lib/audioAnalysis';
+import { DEFAULT_TRACK_COVER } from '@/lib/utils';
 
 export const AudioEngine: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -153,7 +154,8 @@ export const AudioEngine: React.FC = () => {
   // -----------------------------------------------------------------------
   useEffect(() => {
     if ('mediaSession' in navigator && currentTrack) {
-      const coverUrl = getCoverImageUrl(currentTrack.cover_path);
+      const rawCover = getCoverImageUrl(currentTrack.cover_path);
+      const coverUrl = rawCover || DEFAULT_TRACK_COVER;
       navigator.mediaSession.metadata = new MediaMetadata({
         title: currentTrack.title,
         artist: currentTrack.artist,

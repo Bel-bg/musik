@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { getCoverImageUrl } from '@/lib/tauri';
-import { generateFallbackCoverSvg } from '@/lib/utils';
+import { DEFAULT_TRACK_COVER } from '@/lib/utils';
 
 interface CoverArtProps {
   coverPath: string | null;
@@ -20,13 +20,13 @@ const sizeClasses = {
 export const CoverArt: React.FC<CoverArtProps> = ({
   coverPath,
   title,
-  artist,
+  artist: _artist,
   size = 'md',
   className = '',
 }) => {
   const [imageError, setImageError] = useState(false);
 
-  const fallbackSrc = generateFallbackCoverSvg(title || 'M', artist || '');
+  const fallbackSrc = DEFAULT_TRACK_COVER;
   const coverUrl = !imageError && coverPath ? getCoverImageUrl(coverPath) : null;
 
   return (
