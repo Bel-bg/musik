@@ -24,6 +24,7 @@ export const AudioEngine: React.FC = () => {
     nextTrack,
     prevTrack,
     togglePlay,
+    toggleShuffle,
     pause,
     seek,
     setVolume,
@@ -225,6 +226,12 @@ export const AudioEngine: React.FC = () => {
           e.preventDefault();
           toggleMute();
           break;
+        case 'KeyS':
+          if (!e.ctrlKey && !e.metaKey) {
+            e.preventDefault();
+            toggleShuffle();
+          }
+          break;
         case 'KeyN':
           if (!e.ctrlKey && !e.metaKey) {
             e.preventDefault();
@@ -242,7 +249,7 @@ export const AudioEngine: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [togglePlay, nextTrack, prevTrack, seek, volume, setVolume, toggleMute]);
+  }, [togglePlay, toggleShuffle, nextTrack, prevTrack, seek, volume, setVolume, toggleMute]);
 
   // -----------------------------------------------------------------------
   // onCanPlay handler — triggers play after src/load completes

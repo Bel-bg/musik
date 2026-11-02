@@ -3,6 +3,7 @@ import {
   ListBullets,
   Pause,
   Play,
+  Shuffle,
   SkipBack,
   SkipForward,
   SpeakerHigh,
@@ -299,11 +300,37 @@ if (typeof document !== "undefined") {
 /** Touches de transport. Play reste enfoncée et allumée tant que ça joue, comme sur une platine à cassettes. */
 export const TransportControls: React.FC<{
   isPlaying: boolean;
+  shuffle?: boolean;
   onPrev: () => void;
   onPlayPause: () => void;
   onNext: () => void;
-}> = ({ isPlaying, onPrev, onPlayPause, onNext }) => (
-  <div className="flex items-center gap-3 pb-1">
+  onToggleShuffle?: () => void;
+}> = ({
+  isPlaying,
+  shuffle = false,
+  onPrev,
+  onPlayPause,
+  onNext,
+  onToggleShuffle,
+}) => (
+  <div className="flex items-center gap-2.5 pb-1">
+    {onToggleShuffle && (
+      <button
+        type="button"
+        onClick={onToggleShuffle}
+        title={
+          shuffle
+            ? "Mode aléatoire ACTIF (cliquer pour désactiver et lire dans l'ordre)"
+            : "Lecture dans l'ordre (cliquer pour activer le mode aléatoire)"
+        }
+        aria-label="Mode aléatoire"
+        aria-pressed={shuffle}
+        data-latched={shuffle}
+        className="skeu-key skeu-key--round skeu-key--led w-8 h-8 mr-0.5"
+      >
+        <Shuffle size={14} weight={shuffle ? "bold" : "regular"} />
+      </button>
+    )}
     <button
       type="button"
       onClick={onPrev}
@@ -538,6 +565,7 @@ export const QueueButton: React.FC<{
 export const TrackControlWidget: React.FC<{
   track?: Track | null;
   isPlaying: boolean;
+  shuffle?: boolean;
   progressRatio: number;
   remainingSeconds: number;
   volume: number;
@@ -545,6 +573,7 @@ export const TrackControlWidget: React.FC<{
   onPrev: () => void;
   onNext: () => void;
   onPlayPause: () => void;
+  onToggleShuffle?: () => void;
   onSeekRatio: (ratio: number) => void;
   onVolumeChange: (v: number) => void;
   onToggleMute: () => void;
@@ -554,6 +583,7 @@ export const TrackControlWidget: React.FC<{
 }> = ({
   track,
   isPlaying,
+  shuffle = false,
   progressRatio,
   remainingSeconds,
   volume,
@@ -561,6 +591,7 @@ export const TrackControlWidget: React.FC<{
   onPrev,
   onNext,
   onPlayPause,
+  onToggleShuffle,
   onSeekRatio,
   onVolumeChange,
   onToggleMute,
@@ -649,7 +680,24 @@ export const TrackControlWidget: React.FC<{
                 onToggleMute={onToggleMute}
               />
 
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2">
+                {onToggleShuffle && (
+                  <button
+                    type="button"
+                    onClick={onToggleShuffle}
+                    title={
+                      shuffle
+                        ? "Mode aléatoire ACTIF (cliquer pour désactiver et lire dans l'ordre)"
+                        : "Lecture dans l'ordre (cliquer pour activer le mode aléatoire)"
+                    }
+                    aria-label="Mode aléatoire"
+                    aria-pressed={shuffle}
+                    data-latched={shuffle}
+                    className="skeu-key skeu-key--round skeu-key--led w-8 h-8 mr-0.5"
+                  >
+                    <Shuffle size={13} weight={shuffle ? "bold" : "regular"} />
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={onPrev}
@@ -731,6 +779,7 @@ export const TrackControlWidget: React.FC<{
 interface PlayerDockProps {
   discTrack?: Track | null;
   isPlaying: boolean;
+  shuffle?: boolean;
   progressRatio: number;
   remainingSeconds: number;
   volume: number;
@@ -739,6 +788,7 @@ interface PlayerDockProps {
   onPrev: () => void;
   onNext: () => void;
   onPlayPause: () => void;
+  onToggleShuffle?: () => void;
   onSeekRatio: (ratio: number) => void;
   onVolumeChange: (v: number) => void;
   onToggleMute: () => void;
@@ -752,6 +802,7 @@ interface PlayerDockProps {
 export const PlayerDock: React.FC<PlayerDockProps> = ({
   discTrack,
   isPlaying,
+  shuffle = false,
   progressRatio,
   remainingSeconds,
   volume,
@@ -760,6 +811,7 @@ export const PlayerDock: React.FC<PlayerDockProps> = ({
   onPrev,
   onNext,
   onPlayPause,
+  onToggleShuffle,
   onSeekRatio,
   onVolumeChange,
   onToggleMute,
@@ -789,9 +841,11 @@ export const PlayerDock: React.FC<PlayerDockProps> = ({
           </div>
           <TransportControls
             isPlaying={isPlaying}
+            shuffle={shuffle}
             onPrev={onPrev}
             onPlayPause={onPlayPause}
             onNext={onNext}
+            onToggleShuffle={onToggleShuffle}
           />
           <div className="justify-self-end">
             <RemainingTime seconds={remainingSeconds} />
@@ -814,6 +868,7 @@ export const PlayerDock: React.FC<PlayerDockProps> = ({
         <TrackControlWidget
           track={discTrack}
           isPlaying={isPlaying}
+          shuffle={shuffle}
           progressRatio={progressRatio}
           remainingSeconds={remainingSeconds}
           volume={volume}
@@ -821,6 +876,7 @@ export const PlayerDock: React.FC<PlayerDockProps> = ({
           onPrev={onPrev}
           onNext={onNext}
           onPlayPause={onPlayPause}
+          onToggleShuffle={onToggleShuffle}
           onSeekRatio={onSeekRatio}
           onVolumeChange={onVolumeChange}
           onToggleMute={onToggleMute}

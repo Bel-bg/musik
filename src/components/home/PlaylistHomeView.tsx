@@ -5,6 +5,7 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import { useLibraryStore } from "@/store/useLibraryStore";
 import { selectImageFile, tauriApi, openExternalUrl } from "@/lib/tauri";
 import { hapticAudio } from "@/lib/hapticAudio";
+import { sortTracksInOrder } from "@/lib/utils";
 import type { Playlist } from "@/types";
 import { VinylPlaylistCard } from "./VinylPlaylistCard";
 import { SettingsView } from "@/components/settings/SettingsView";
@@ -433,10 +434,11 @@ export const PlaylistHomeView: React.FC<PlaylistHomeViewProps> = ({
         const folderTracks = tracks.filter((t) =>
           t.filepath.replace(/\\/g, "/").startsWith(normalized + "/"),
         );
-        if (folderTracks.length > 0) {
+        const sortedFolderTracks = sortTracksInOrder(folderTracks);
+        if (sortedFolderTracks.length > 0) {
           await addTracksToPlaylist(
             pl.id,
-            folderTracks.map((t) => t.id),
+            sortedFolderTracks.map((t) => t.id),
           );
         }
       }

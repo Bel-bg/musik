@@ -13,6 +13,7 @@ import { usePlaylistStore } from '@/store/usePlaylistStore';
 import { Modal } from '@/components/common/Modal';
 import { selectImageFile, getCoverImageUrl, isTauriEnvironment, tauriApi } from '@/lib/tauri';
 import { hapticAudio } from '@/lib/hapticAudio';
+import { sortTracksInOrder } from '@/lib/utils';
 
 type WizardStep = 'name' | 'cover' | 'folder';
 
@@ -79,10 +80,11 @@ export const Sidebar: React.FC = () => {
       const folderTracks = tracks.filter((t) =>
         t.filepath.replace(/\\/g, '/').startsWith(normalized + '/')
       );
-      if (folderTracks.length > 0) {
+      const sortedFolderTracks = sortTracksInOrder(folderTracks);
+      if (sortedFolderTracks.length > 0) {
         await addTracksToPlaylist(
           playlist.id,
-          folderTracks.map((t) => t.id)
+          sortedFolderTracks.map((t) => t.id)
         );
       }
 

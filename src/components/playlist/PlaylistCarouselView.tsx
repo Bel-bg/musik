@@ -6,7 +6,7 @@ import React, {
   useRef,
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft } from "@phosphor-icons/react";
+import { ArrowLeft, Shuffle } from "@phosphor-icons/react";
 import { usePlaylistStore } from "@/store/usePlaylistStore";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useLibraryStore } from "@/store/useLibraryStore";
@@ -17,6 +17,7 @@ import { VirtualizedTrackList } from "@/components/library/VirtualizedTrackList"
 import { useTrackCover } from "@/hooks/useTrackCover";
 import { CoverDisplay } from "@/components/player/CoverDisplay";
 import { PlayerDock } from "@/components/player/PlayerDock";
+import { sortTracksInOrder } from "@/lib/utils";
 import type { Track } from "@/types";
 
 /* -------------------------------------------------------------------------- */
@@ -245,12 +246,14 @@ export const PlaylistCarouselView: React.FC<PlaylistCarouselViewProps> = ({
   const {
     currentTrack,
     isPlaying,
+    shuffle,
     currentTime,
     duration,
     volume,
     isMuted,
     playTrack,
     togglePlay,
+    toggleShuffle,
     prevTrack,
     nextTrack,
     seek,
@@ -404,10 +407,11 @@ export const PlaylistCarouselView: React.FC<PlaylistCarouselViewProps> = ({
         const folderTracks = allLibTracks.filter((t) =>
           t.filepath.replace(/\\/g, "/").startsWith(normalized + "/"),
         );
-        if (folderTracks.length > 0) {
+        const sortedFolderTracks = sortTracksInOrder(folderTracks);
+        if (sortedFolderTracks.length > 0) {
           await addTracksToPlaylist(
             currentPl.id,
-            folderTracks.map((t) => t.id),
+            sortedFolderTracks.map((t) => t.id),
           );
           await loadPlaylistDetail(currentPl.id);
         }
@@ -489,21 +493,43 @@ export const PlaylistCarouselView: React.FC<PlaylistCarouselViewProps> = ({
             <span className="text-xs font-mono font-bold tracking-widest text-[#8e92a0] uppercase">
               {currentPl?.name || "PLAYLIST"}
             </span>
-            {/* {tracks.length > 0 && (
-              <span className="text-[10px] font-mono text-[#ff9d33] bg-[#22180e] px-2 py-0.5 rounded-full border border-[#ff9d33]/30">
-                {index + 1}/{tracks.length}
-              </span>
-            )} */}
           </div>
 
-          <button
-            onClick={handleAddFolder}
-            disabled={isAddingFolder}
-            title="Ajouter un dossier musical à cette bande"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#181920] border border-[#2a2c36] text-[#8e92a0] hover:text-[#ff9d33] transition-colors text-xs font-mono"
-          >
-            <span className="hidden sm:inline">Ajouter</span>
-          </button>
+          <div className="flex items-center gap-2.5">
+            {/* Bouton bascule Ordre / Aléatoire */}
+            <button
+              onClick={() => {
+                hapticAudio.playToggleSnap();
+                toggleShuffle();
+              }}
+              title={
+                shuffle
+                  ? "Mode aléatoire ACTIF (cliquer pour lire dans l'ordre)"
+                  : "Lecture dans l'ordre (cliquer pour activer le mode aléatoire)"
+              }
+              aria-label="Basculer le mode aléatoire"
+              aria-pressed={shuffle}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-mono tracking-wider transition-all shadow-md ${
+                shuffle
+                  ? "bg-[#2c190a] border-[#ff9d33] text-[#ff9d33] shadow-[0_0_12px_rgba(255,157,51,0.25)]"
+                  : "bg-[#181920] border-[#2a2c36] text-[#8e92a0] hover:text-[#ff9d33]"
+              }`}
+            >
+              <Shuffle size={15} weight={shuffle ? "bold" : "regular"} />
+              <span className="hidden sm:inline">
+                {shuffle ? "Aléatoire : Actif" : "Ordre : 1 2 3"}
+              </span>
+            </button>
+
+            <button
+              onClick={handleAddFolder}
+              disabled={isAddingFolder}
+              title="Ajouter un dossier musical à cette bande"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#181920] border border-[#2a2c36] text-[#8e92a0] hover:text-[#ff9d33] transition-colors text-xs font-mono"
+            >
+              <span className="hidden sm:inline">Ajouter</span>
+            </button>
+          </div>
         </div>
 
         {/* Rangée : scène du carrousel + liste de lecture intégrée */}
@@ -577,6 +603,7 @@ export const PlaylistCarouselView: React.FC<PlaylistCarouselViewProps> = ({
         <PlayerDock
           discTrack={currentTrack ?? activeTrack}
           isPlaying={isPlaying}
+          shuffle={shuffle}
           progressRatio={progressRatio}
           remainingSeconds={remainingSeconds}
           volume={volume}
@@ -585,6 +612,10 @@ export const PlaylistCarouselView: React.FC<PlaylistCarouselViewProps> = ({
           onPrev={handlePrev}
           onNext={handleNext}
           onPlayPause={handlePlayActive}
+          onToggleShuffle={() => {
+            hapticAudio.playToggleSnap();
+            toggleShuffle();
+          }}
           onSeekRatio={handleSeekRatio}
           onVolumeChange={setVolume}
           onToggleMute={() => {

@@ -55,3 +55,44 @@ export function generateFallbackCoverSvg(title: string, artist: string): string 
 
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
+
+/**
+ * Trie une liste de pistes dans leur ordre naturel séquentiel :
+ * 1. Numéro de piste si disponible (sur un même album)
+ * 2. Tri naturel sur le chemin de fichier (ex: 01.mp3, 02.mp3 ... 10.mp3)
+ * 3. Titre en cas d'égalité
+ */
+export function sortTracksInOrder<
+  T extends {
+    filepath: string;
+    track_number?: number | null;
+    album?: string | null;
+    title?: string | null;
+  },
+>(tracks: T[]): T[] {
+  return [...tracks].sort((a, b) => {
+    // 1. Numéro de piste si même album
+    if (a.album && b.album && a.album.trim().toLowerCase() === b.album.trim().toLowerCase()) {
+      if (
+        typeof a.track_number === "number" &&
+        typeof b.track_number === "number" &&
+        a.track_number > 0 &&
+        b.track_number > 0 &&
+        a.track_number !== b.track_number
+      ) {
+        return a.track_number - b.track_number;
+      }
+    }
+    // 2. Tri numérique naturel par nom de fichier / chemin
+    const cmp = a.filepath.localeCompare(b.filepath, undefined, {
+      numeric: true,
+      sensitivity: "base",
+    });
+    if (cmp !== 0) return cmp;
+    // 3. Repli par titre
+    return (a.title || "").localeCompare(b.title || "", undefined, {
+      numeric: true,
+      sensitivity: "base",
+    });
+  });
+}
