@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { generateFallbackCoverSvg } from "@/lib/utils";
+import { DEFAULT_TRACK_COVER } from "@/lib/utils";
 import { useTrackCover } from "@/hooks/useTrackCover";
 import type { Track } from "@/types";
 
@@ -26,9 +26,7 @@ export const CoverDisplay: React.FC<CoverDisplayProps> = ({
   }
 
   const usableCover = coverUrl && coverUrl !== failedUrl ? coverUrl : null;
-  const finalSrc =
-    usableCover ||
-    (track ? generateFallbackCoverSvg(track.title, track.artist || "") : "");
+  const finalSrc = usableCover || DEFAULT_TRACK_COVER;
 
   return (
     <img

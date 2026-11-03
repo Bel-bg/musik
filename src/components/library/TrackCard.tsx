@@ -1,6 +1,6 @@
 import React from "react";
 import { Play } from "lucide-react";
-import { formatDuration, generateFallbackCoverSvg } from "@/lib/utils";
+import { formatDuration, DEFAULT_TRACK_COVER } from "@/lib/utils";
 import { hapticAudio } from "@/lib/hapticAudio";
 import { useTrackCover } from "@/hooks/useTrackCover";
 import type { Track, ScannedTrackMetadata } from "@/types";
@@ -176,8 +176,7 @@ export const TrackCard: React.FC<TrackCardProps> = ({
     onPlay?.();
   };
 
-  const cover =
-    coverUrl ?? generateFallbackCoverSvg(track.title, track.artist || "");
+  const cover = coverUrl || DEFAULT_TRACK_COVER;
 
   return (
     <div

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { tauriApi, getCoverImageUrl } from '@/lib/tauri';
+import { DEFAULT_TRACK_COVER } from '@/lib/utils';
 import type { Track, ScannedTrackMetadata } from '@/types';
 
 // Bounded LRU in-memory cache for cover URLs (shared by every component).
@@ -42,7 +43,7 @@ export function resolveTrackCover(track: CoverSource): Promise<string | null> {
   const pending = pendingRequests.get(track.filepath);
   if (pending) return pending;
 
-  const fallback = track.cover_path ? getCoverImageUrl(track.cover_path) : null;
+  const fallback = track.cover_path ? getCoverImageUrl(track.cover_path) : DEFAULT_TRACK_COVER;
 
   const request = tauriApi
     .extractMp3Cover(track.filepath)
@@ -52,9 +53,10 @@ export function resolveTrackCover(track: CoverSource): Promise<string | null> {
       return fallback;
     })
     .then((url) => {
-      setCachedCoverUrl(track.filepath, url);
+      const finalUrl = url || DEFAULT_TRACK_COVER;
+      setCachedCoverUrl(track.filepath, finalUrl);
       pendingRequests.delete(track.filepath);
-      return url;
+      return finalUrl;
     });
 
   pendingRequests.set(track.filepath, request);

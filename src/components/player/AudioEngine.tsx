@@ -3,6 +3,7 @@ import { convertFileSrc, isTauri } from '@tauri-apps/api/core';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { getAudioFileUrl, getCoverImageUrl, fetchStreamInfo } from '@/lib/tauri';
 import { audioAnalysis } from '@/lib/audioAnalysis';
+import { DEFAULT_TRACK_COVER } from '@/lib/utils';
 
 export const AudioEngine: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -24,6 +25,7 @@ export const AudioEngine: React.FC = () => {
     nextTrack,
     prevTrack,
     togglePlay,
+    toggleShuffle,
     pause,
     seek,
     setVolume,
@@ -152,7 +154,8 @@ export const AudioEngine: React.FC = () => {
   // -----------------------------------------------------------------------
   useEffect(() => {
     if ('mediaSession' in navigator && currentTrack) {
-      const coverUrl = getCoverImageUrl(currentTrack.cover_path);
+      const rawCover = getCoverImageUrl(currentTrack.cover_path);
+      const coverUrl = rawCover || DEFAULT_TRACK_COVER;
       navigator.mediaSession.metadata = new MediaMetadata({
         title: currentTrack.title,
         artist: currentTrack.artist,
@@ -225,6 +228,12 @@ export const AudioEngine: React.FC = () => {
           e.preventDefault();
           toggleMute();
           break;
+        case 'KeyS':
+          if (!e.ctrlKey && !e.metaKey) {
+            e.preventDefault();
+            toggleShuffle();
+          }
+          break;
         case 'KeyN':
           if (!e.ctrlKey && !e.metaKey) {
             e.preventDefault();
@@ -242,7 +251,7 @@ export const AudioEngine: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [togglePlay, nextTrack, prevTrack, seek, volume, setVolume, toggleMute]);
+  }, [togglePlay, toggleShuffle, nextTrack, prevTrack, seek, volume, setVolume, toggleMute]);
 
   // -----------------------------------------------------------------------
   // onCanPlay handler — triggers play after src/load completes

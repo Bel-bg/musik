@@ -40,18 +40,49 @@ export function stringToColor(str: string): string {
   return '#' + '00000'.substring(0, 6 - c.length) + c;
 }
 
-export function generateFallbackCoverSvg(title: string, artist: string): string {
-  const initial1 = (title.trim()[0] || 'M').toUpperCase();
-  const initial2 = (artist.trim()[0] || '').toUpperCase();
-  const initials = initial2 ? `${initial1}${initial2}` : initial1;
-  const color = stringToColor(title + artist);
+export const DEFAULT_TRACK_COVER = '/default_cover.jpg';
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
-    <rect width="300" height="300" fill="#111114"/>
-    <circle cx="150" cy="150" r="110" fill="${color}" opacity="0.18"/>
-    <circle cx="150" cy="150" r="70" fill="${color}" opacity="0.3"/>
-    <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="'Bricolage Grotesque', sans-serif" font-size="64" font-weight="800" fill="#f0f0f4" letter-spacing="-2">${initials}</text>
-  </svg>`;
+export function generateFallbackCoverSvg(_title?: string, _artist?: string): string {
+  return DEFAULT_TRACK_COVER;
+}
 
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+/**
+ * Trie une liste de pistes dans leur ordre naturel séquentiel :
+ * 1. Numéro de piste si disponible (sur un même album)
+ * 2. Tri naturel sur le chemin de fichier (ex: 01.mp3, 02.mp3 ... 10.mp3)
+ * 3. Titre en cas d'égalité
+ */
+export function sortTracksInOrder<
+  T extends {
+    filepath: string;
+    track_number?: number | null;
+    album?: string | null;
+    title?: string | null;
+  },
+>(tracks: T[]): T[] {
+  return [...tracks].sort((a, b) => {
+    // 1. Numéro de piste si même album
+    if (a.album && b.album && a.album.trim().toLowerCase() === b.album.trim().toLowerCase()) {
+      if (
+        typeof a.track_number === "number" &&
+        typeof b.track_number === "number" &&
+        a.track_number > 0 &&
+        b.track_number > 0 &&
+        a.track_number !== b.track_number
+      ) {
+        return a.track_number - b.track_number;
+      }
+    }
+    // 2. Tri numérique naturel par nom de fichier / chemin
+    const cmp = a.filepath.localeCompare(b.filepath, undefined, {
+      numeric: true,
+      sensitivity: "base",
+    });
+    if (cmp !== 0) return cmp;
+    // 3. Repli par titre
+    return (a.title || "").localeCompare(b.title || "", undefined, {
+      numeric: true,
+      sensitivity: "base",
+    });
+  });
 }
