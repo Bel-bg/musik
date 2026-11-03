@@ -3,6 +3,7 @@ import { Minus, Square, Copy, X } from "lucide-react";
 import { getCurrentWindow, type Window } from "@tauri-apps/api/window";
 import { isTauriEnvironment } from "@/lib/tauri";
 import { hapticAudio } from "@/lib/hapticAudio";
+import { UpdateBadge } from "@/components/common/UpdateBadge";
 
 /* -------------------------------------------------------------------------- */
 /*  Styles skeuomorphiques de la barre de titre (autonomes)                    */
@@ -178,6 +179,8 @@ export const CustomTitlebar: React.FC = memo(() => {
 
       {/* Droite : touches de fenêtre */}
       <div className="flex items-center justify-end gap-2">
+        <UpdateBadge />
+
         <button
           type="button"
           onClick={handleMinimize}

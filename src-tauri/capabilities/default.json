@@ -35,6 +35,8 @@
     "fs:default",
     "fs:allow-read-file",
     "fs:allow-write-file",
-    "fs:allow-exists"
+    "fs:allow-exists",
+    "updater:default",
+    "process:default"
   ]
 }

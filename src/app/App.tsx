@@ -9,6 +9,7 @@ import { PlaylistHomeView } from '@/components/home/PlaylistHomeView';
 import { PlaylistCarouselView } from '@/components/playlist/PlaylistCarouselView';
 import { SplashScreen } from '@/components/splash/SplashScreen';
 import { startMiniPlayerBridge } from '@/lib/miniPlayer';
+import { useUpdaterStore } from '@/store/useUpdaterStore';
 
 export const App: React.FC = () => {
   const { loadLibrary } = useLibraryStore();
@@ -36,6 +37,14 @@ export const App: React.FC = () => {
 
   // Relais audio/état vers la fenêtre miniature
   useEffect(() => startMiniPlayerBridge(), []);
+
+  // Vérification automatique et silencieuse des mises à jour au démarrage
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      useUpdaterStore.getState().checkForUpdates(true);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleOpenPlaylist = (playlistId: string) => {
     setSelectedPlaylistId(playlistId);

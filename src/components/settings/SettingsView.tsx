@@ -2,8 +2,14 @@ import React, { useState, useEffect } from "react";
 import {
   Trash2,
   Check,
+  RefreshCw,
+  Sparkles,
+  Download,
+  CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
 import { useLibraryStore } from "@/store/useLibraryStore";
+import { useUpdaterStore } from "@/store/useUpdaterStore";
 import { tauriApi, openExternalUrl } from "@/lib/tauri";
 import { hapticAudio } from "@/lib/hapticAudio";
 import type { AppSettings } from "@/types";
@@ -34,6 +40,16 @@ export const SettingsView: React.FC = () => {
     hapticAudio.getEnabled(),
   );
   const [savedFeedback, setSavedFeedback] = useState(false);
+
+  const {
+    status: updateStatus,
+    availableVersion,
+    downloadProgress,
+    errorMessage: updateError,
+    checkForUpdates,
+    downloadAndInstall,
+    relaunchApp,
+  } = useUpdaterStore();
 
   useEffect(() => {
     tauriApi.getSettings().then((res) => {
@@ -251,6 +267,117 @@ export const SettingsView: React.FC = () => {
               M
             </kbd>
           </div>
+        </div>
+      </div>
+
+      {/* Mise à jour du logiciel */}
+      <div className="skeuo-panel rounded-card p-6 flex flex-col gap-4 metal-grain">
+        <div className="flex items-center justify-between z-10 flex-wrap gap-3">
+          <div className="flex flex-col gap-0.5">
+            <h2 className="heading-tight text-lg text-text-primary flex items-center gap-2">
+              <Sparkles size={18} className="text-accent" />
+              Mises à jour logicielles
+            </h2>
+            <p className="text-xs text-text-muted">
+              Détection automatique des nouvelles versions et téléchargement direct depuis GitHub Releases.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              hapticAudio.playHeavySwitch();
+              checkForUpdates(false);
+            }}
+            disabled={updateStatus === 'checking' || updateStatus === 'downloading'}
+            className="flex items-center gap-2 px-4 py-2 skeuo-btn rounded-btn text-xs font-bold text-text-primary disabled:opacity-50 cursor-pointer"
+          >
+            <RefreshCw
+              size={13}
+              className={updateStatus === 'checking' ? 'animate-spin text-accent' : 'text-accent'}
+            />
+            <span>
+              {updateStatus === 'checking' ? 'Vérification en cours...' : 'Vérifier les mises à jour'}
+            </span>
+          </button>
+        </div>
+
+        {/* Détails et statut de la mise à jour */}
+        <div className="skeuo-recessed p-4 rounded-lg border border-border z-10 flex flex-col gap-3">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-text-muted">Version actuellement installée :</span>
+            <span className="font-mono text-accent font-bold">v{settings.version || "1.0.0"}</span>
+          </div>
+
+          {updateStatus === 'up-to-date' && (
+            <div className="flex items-center gap-2 text-xs text-emerald-400 font-medium">
+              <CheckCircle2 size={15} />
+              <span>Votre lecteur MUSIK est à jour. Vous disposez de la dernière version.</span>
+            </div>
+          )}
+
+          {updateStatus === 'available' && (
+            <div className="flex flex-col gap-3 pt-2 border-t border-white/5">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2 text-xs text-accent font-mono font-bold">
+                  <Sparkles size={14} className="animate-pulse" />
+                  <span>Version v{availableVersion} disponible !</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    hapticAudio.playToggleSnap();
+                    downloadAndInstall();
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-accent text-background rounded-btn text-xs font-bold hover:brightness-110 shadow-[0_0_12px_rgba(255,157,51,0.4)] cursor-pointer"
+                >
+                  <Download size={13} />
+                  <span>Télécharger et installer</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {updateStatus === 'downloading' && (
+            <div className="flex flex-col gap-2 pt-2 border-t border-white/5">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="text-text-muted">Téléchargement du package en cours...</span>
+                <span className="text-accent font-bold">{downloadProgress}%</span>
+              </div>
+              <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden border border-white/10">
+                <div
+                  className="h-full bg-accent transition-all duration-200"
+                  style={{ width: `${downloadProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {updateStatus === 'ready' && (
+            <div className="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-white/5">
+              <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold">
+                <CheckCircle2 size={15} />
+                <span>Mise à jour installée avec succès !</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  hapticAudio.playHeavySwitch();
+                  relaunchApp();
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-black rounded-btn text-xs font-bold hover:brightness-110 shadow-[0_0_12px_rgba(16,185,129,0.4)] cursor-pointer"
+              >
+                <span>Redémarrer le lecteur</span>
+              </button>
+            </div>
+          )}
+
+          {updateStatus === 'error' && (
+            <div className="flex items-center gap-2 text-xs text-red-400 font-medium pt-2 border-t border-white/5">
+              <AlertCircle size={15} className="shrink-0" />
+              <span>{updateError || "Erreur lors de la vérification de mise à jour."}</span>
+            </div>
+          )}
         </div>
       </div>
 
