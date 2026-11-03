@@ -341,7 +341,7 @@ export const tauriApi = {
       restore_last_track_on_startup: true,
       restore_last_view_on_startup: true,
       media_keys_enabled: true,
-      version: '1.0.1',
+      version: '1.0.2',
     };
   },
 
