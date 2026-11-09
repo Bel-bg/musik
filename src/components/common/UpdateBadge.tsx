@@ -61,7 +61,6 @@ export const UpdateBadge: React.FC = () => {
       >
         {status === 'available' && (
           <>
-            <Sparkles size={13} className="text-accent animate-pulse" />
             <span className="leading-none text-[11px] tracking-wide">
               v{availableVersion} dispo
             </span>
