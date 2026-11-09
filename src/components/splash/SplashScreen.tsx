@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence, animate, useMotionValue } from "framer-motion";
-import InfiniteSpiral from "../InfiniteSpiral";
-import FoldText from "../FoldText";
+import ElasticMesh from "./ElasticMesh";
 import { SkeuProgressBar } from "./SkeuProgressBar";
 
 interface SplashScreenProps {
@@ -9,24 +8,10 @@ interface SplashScreenProps {
   isDataLoaded?: boolean;
 }
 
-const SPIRAL_IMAGES = [
-  { src: "/pics/1.jpg", alt: "Album cover" },
-  { src: "/pics/2.jpg", alt: "Musik Vinyl" },
-  { src: "/pics/3.jpg", alt: "Hi-Fi Reel" },
-  { src: "/pics/4.jpg", alt: "Tape Master" },
-  { src: "/pics/5.jpg", alt: "Vinyl Record" },
-  { src: "/pics/6.jpg", alt: "Audio Console" },
-  { src: "/pics/7.jpg", alt: "Vinyl Sleeve" },
-  { src: "/pics/8.jpg", alt: "Audiophile Sound" },
-];
-
-export const SplashScreen: React.FC<SplashScreenProps> = ({
-  onComplete,
-}) => {
-  const [showTitle, setShowTitle] = useState(false);
+export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
   const [isClosing, setIsClosing] = useState(false);
 
-  // Progression 0 à 100, hors du state React pour ne pas re-render la spirale.
+  // Progression 0 à 100, hors du state React pour ne pas re-render le mesh.
   const progress = useMotionValue(0);
 
   useEffect(() => {
@@ -39,21 +24,17 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
   }, [progress]);
 
   useEffect(() => {
-    // À t ≈ 1s : apparition du nom de l'application avec FoldText
-    const titleTimer = setTimeout(() => {
-      setShowTitle(true);
-    }, 1000);
+    let exitTimer: ReturnType<typeof setTimeout> | undefined;
 
-    // À t = 3s : fin du splashscreen (durée totale 3 secondes)
+    // À t = 3s : fermeture automatique, puis onComplete après l'animation de sortie.
     const finishTimer = setTimeout(() => {
       setIsClosing(true);
-      const exitTimer = setTimeout(onComplete, 500);
-      return () => clearTimeout(exitTimer);
+      exitTimer = setTimeout(onComplete, 500);
     }, 3000);
 
     return () => {
-      clearTimeout(titleTimer);
       clearTimeout(finishTimer);
+      if (exitTimer) clearTimeout(exitTimer);
     };
   }, [onComplete]);
 
@@ -78,84 +59,21 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
             `,
           }}
         >
-          {/* Subtle audio studio ambient grid */}
+          {/* stopPropagation : attraper/étirer le mesh ne doit pas fermer le splash */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-[0.03]"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.15) 1px, transparent 1px)",
-              backgroundSize: "36px 36px",
-            }}
-          />
-
-          {/* pb-40 : réserve la place de la barre en bas pour qu'elle ne chevauche ni la spirale ni le titre */}
-          <div className="w-full max-w-5xl h-full flex flex-col md:flex-row items-center justify-center px-8 pb-40 gap-8 md:gap-16 relative z-10">
-            {/* Colonne gauche : Spirale infinie 3D (commence dès 0s) */}
-            <div className="w-full md:w-1/2 h-[320px] sm:h-[400px] md:h-[500px] relative flex items-center justify-center">
-              <InfiniteSpiral
-                items={SPIRAL_IMAGES}
-                animationMode="auto"
-                speed={0.65}
-                radius={150}
-                cardWidth={96}
-                cardHeight={96}
-                verticalSpacing={56}
-                perspective={1000}
-                cardRadius={12}
-                centerScale={1.25}
-                edgeBlur={5}
-                cardsPerTurn={6}
-                pauseOnHover={false}
-                direction="up"
-                rotation={-8}
-                cardTilt={4}
-                edgeFade={0.32}
-                imageFit="cover"
-                grayscale={0}
-                className="w-full h-full"
-              />
-            </div>
-
-            {/* Colonne droite : Nom de l'appli apparaissant à ~1s avec FoldText */}
-            <div className="w-full md:w-1/2 flex flex-col items-center md:items-start justify-center min-h-[160px]">
-              {showTitle && (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                  className="flex flex-col items-center md:items-start"
-                >
-                  <FoldText
-                    text="MUSIK"
-                    splitBy="char"
-                    hinge="top"
-                    trigger="mount"
-                    duration={0.7}
-                    stagger={0.06}
-                    ease="power3.out"
-                    perspective={800}
-                    creaseShading={0.55}
-                    fontSize={76}
-                    fontWeight={900}
-                    color="#f59e0b"
-                    className="tracking-widest uppercase"
-                  />
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.45, duration: 0.4 }}
-                    className="mt-4 flex items-center gap-3"
-                  >
-                    <span className="h-[1px] w-6 bg-gradient-to-r from-transparent to-amber-500/60" />
-                    <span className="text-xs sm:text-sm font-mono tracking-[0.3em] uppercase text-neutral-400 font-semibold">
-                      Lecteur Audio
-                    </span>
-                    <span className="h-[1px] w-6 bg-gradient-to-l from-transparent to-amber-500/60" />
-                  </motion.div>
-                </motion.div>
-              )}
-            </div>
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-2xl h-[460px] mb-36 cursor-grab active:cursor-grabbing"
+          >
+            <ElasticMesh
+              src="/logo.svg"
+              material="chrome"
+              imageColors={false}
+              grabRadius={70}
+              stretch={0.5}
+              press={0.5}
+              shadow={0.5}
+              intro
+            />
           </div>
 
           {/* Barre de progression skeuomorphique, centrée en bas */}
