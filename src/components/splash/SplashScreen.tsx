@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, animate, useMotionValue } from "framer-motion";
 import InfiniteSpiral from "../InfiniteSpiral";
 import FoldText from "../FoldText";
+import { SkeuProgressBar } from "./SkeuProgressBar";
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -24,6 +25,18 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
 }) => {
   const [showTitle, setShowTitle] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+
+  // Progression 0 à 100, hors du state React pour ne pas re-render la spirale.
+  const progress = useMotionValue(0);
+
+  useEffect(() => {
+    // Atteint 100 % à 2,6s : la barre reste pleine ~0,4s avant la fermeture.
+    const controls = animate(progress, 100, {
+      duration: 2.6,
+      ease: [0.45, 0.05, 0.25, 1],
+    });
+    return () => controls.stop();
+  }, [progress]);
 
   useEffect(() => {
     // À t ≈ 1s : apparition du nom de l'application avec FoldText
@@ -75,7 +88,8 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
             }}
           />
 
-          <div className="w-full max-w-5xl h-full flex flex-col md:flex-row items-center justify-center px-8 gap-8 md:gap-16 relative z-10">
+          {/* pb-40 : réserve la place de la barre en bas pour qu'elle ne chevauche ni la spirale ni le titre */}
+          <div className="w-full max-w-5xl h-full flex flex-col md:flex-row items-center justify-center px-8 pb-40 gap-8 md:gap-16 relative z-10">
             {/* Colonne gauche : Spirale infinie 3D (commence dès 0s) */}
             <div className="w-full md:w-1/2 h-[320px] sm:h-[400px] md:h-[500px] relative flex items-center justify-center">
               <InfiniteSpiral
@@ -142,6 +156,17 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
                 </motion.div>
               )}
             </div>
+          </div>
+
+          {/* Barre de progression skeuomorphique, centrée en bas */}
+          <div className="absolute inset-x-0 bottom-8 z-20 flex justify-center pointer-events-none">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <SkeuProgressBar value={progress} label="Chargement" />
+            </motion.div>
           </div>
         </motion.div>
       )}
